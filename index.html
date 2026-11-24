@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WebAR Relevo do Rio de Janeiro — LAIGEO / UERJ | VIII JGEOTEC 2026</title>
+  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
+  <style>
+    :root {
+      --uerj-blue: #004a8f;
+      --laigeo-purple: #2d1b54;
+      --bg-dark: #0f172a;
+      --card-bg: #1e293b;
+      --text-light: #f8fafc;
+      --accent: #38bdf8;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, sans-serif; }
+    body {
+      background: var(--bg-dark);
+      color: var(--text-light);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    header {
+      background: linear-gradient(135deg, var(--laigeo-purple), var(--uerj-blue));
+      padding: 12px 16px;
+      border-bottom: 2px solid var(--accent);
+    }
+    header h1 { font-size: 1.02rem; font-weight: 700; }
+    header p { font-size: 0.76rem; opacity: 0.92; margin-top: 2px; }
+    .viewer-container {
+      position: relative;
+      flex: 1;
+      min-height: 54vh;
+      background: radial-gradient(circle at center, #1e293b 0%, #090d16 100%);
+    }
+    model-viewer {
+      width: 100%;
+      height: 55vh;
+      --poster-color: transparent;
+    }
+    .ar-btn {
+      position: absolute;
+      bottom: 14px;
+      right: 14px;
+      background: #10b981;
+      color: #052e16;
+      border: none;
+      border-radius: 999px;
+      padding: 11px 18px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      box-shadow: 0 6px 20px rgba(16, 185, 129, 0.45);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .hotspot {
+      background: rgba(15, 23, 42, 0.9);
+      border: 1.5px solid var(--accent);
+      border-radius: 8px;
+      color: #fff;
+      font-size: 0.72rem;
+      padding: 4px 8px;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+    .info-box {
+      background: #0b1324;
+      border-top: 1px solid #334155;
+      padding: 10px 16px;
+      font-size: 0.78rem;
+      line-height: 1.4;
+      color: #e2e8f0;
+    }
+    .info-box strong { color: var(--accent); }
+    .controls {
+      background: var(--card-bg);
+      padding: 12px 16px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      border-top: 1px solid #334155;
+    }
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 0.78rem;
+    }
+    .control-group.full { grid-column: 1 / -1; }
+    select, input[type="range"], input[type="file"] {
+      background: #0f172a;
+      color: #f8fafc;
+      border: 1px solid #475569;
+      border-radius: 6px;
+      padding: 6px 8px;
+      font-size: 0.8rem;
+    }
+    .legend {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.72rem;
+      padding: 6px 16px 12px;
+      background: var(--card-bg);
+      color: #cbd5e1;
+    }
+    .gradient-bar {
+      height: 9px;
+      flex: 1;
+      margin: 0 10px;
+      border-radius: 99px;
+      background: linear-gradient(90deg, #0284c7, #16a34a, #eab308, #dc2626, #f8fafc);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>LAIGEO / UERJ — Maciços Costeiros do Rio de Janeiro (WebAR)</h1>
+    <p>Oficina 4 • VIII JGEOTEC 2026 • Engenharia Cartográfica e de Agrimensura (FEN/UERJ)</p>
+  </header>
+
+  <div class="viewer-container">
+    <model-viewer
+      id="terrainViewer"
+      alt="Modelo Digital de Elevação 3D dos Maciços do Rio de Janeiro em Realidade Aumentada"
+      ar
+      ar-modes="webxr scene-viewer quick-look"
+      ar-scale="auto"
+      camera-controls
+      touch-action="pan-y"
+      shadow-intensity="1"
+      auto-rotate
+      auto-rotate-delay="1800"
+      camera-orbit="32deg 56deg 0.88m">
+
+      <button id="hs1" class="hotspot" slot="hotspot-1" data-position="0.03 0.085 -0.02" data-normal="0 1 0">
+        ⛰️ Pico da Tijuca (1.021 m)
+      </button>
+      <button id="hs2" class="hotspot" slot="hotspot-2" data-position="-0.06 0.055 0.05" data-normal="0 1 0">
+        🪨 Pedra Bonita / Gávea (844 m)
+      </button>
+      <button id="hs3" class="hotspot" slot="hotspot-3" data-position="0.08 0.020 0.07" data-normal="0 1 0">
+        🌊 Baixada / Lagoa Rodrigo de Freitas
+      </button>
+
+      <button slot="ar-button" class="ar-btn">
+        📱 Projetar Relevo na Mesa (RA)
+      </button>
+    </model-viewer>
+  </div>
+
+  <div class="info-box" id="geoContext">
+    <strong>Maciço da Tijuca (Zona Norte / Sul / Oeste — RJ):</strong> Núcleo cristalino escarpado (1.021 m no Pico da Tijuca), divisor de águas entre as vertentes da Baía de Guanabara, Zona Sul e Baixada de Jacarepaguá.
+  </div>
+
+  <div class="legend">
+    <span>0 m (Nível do Mar)</span>
+    <div class="gradient-bar"></div>
+    <span>&gt; 1.000 m (Cumeada)</span>
+  </div>
+
+  <section class="controls">
+    <div class="control-group">
+      <label for="terrainPreset">Compartimento Geomorfológico (RJ):</label>
+      <select id="terrainPreset">
+        <option value="tijuca">Maciço da Tijuca (Pico da Tijuca • 1.021 m)</option>
+        <option value="pedrabranca">Maciço da Pedra Branca (Pico da Pedra Branca • 1.024 m)</option>
+        <option value="comparativo">Comparativo RJ: Pedra Branca × Baixada × Tijuca</option>
+      </select>
+    </div>
+
+    <div class="control-group">
+      <label for="exaggeration">Exagero Vertical: <strong id="exagVal">1.5x</strong></label>
+      <input id="exaggeration" type="range" min="0.5" max="3.0" step="0.1" value="1.5" />
+    </div>
+
+    <div class="control-group full">
+      <label for="customGlb">Carregar seu próprio MDT/malha 3D (.glb) do QGIS ou Blender:</label>
+      <input id="customGlb" type="file" accept=".glb,.gltf" />
+    </div>
+  </section>
+
+  <script>
+    const SCENARIOS = {
+      tijuca: {
+        desc: "<strong>Maciço da Tijuca (RJ):</strong> Maciço costeiro de encostas íngremes (1.021 m no Pico da Tijuca), com forte controle estrutural, drenagem radial em direção à Bacia da Baía de Guanabara (Maracanã/Tijuca), Lagoa Rodrigo de Freitas e Jacarepaguá.",
+        hs: [
+          { text: "⛰️ Pico da Tijuca (1.021 m)", pos: "0.02 0.088 -0.02" },
+          { text: "🪨 Pedra da Gávea / Bonita (844 m)", pos: "-0.05 0.062 0.08" },
+          { text: "🏙️ Bacia do Maracanã / Guanabara", pos: "0.09 0.015 -0.09" }
+        ]
+      },
+      pedrabranca: {
+        desc: "<strong>Maciço da Pedra Branca (Zona Oeste — RJ):</strong> Maior bloco montanhoso do município do Rio de Janeiro, culminando no Pico da Pedra Branca (1.024 m — ponto mais alto da cidade), cercado pelas baixadas de Jacarepaguá, Campo Grande e Guaratiba.",
+        hs: [
+          { text: "⛰️ Pico da Pedra Branca (1.024 m)", pos: "-0.01 0.092 0.00" },
+          { text: "🌿 Vertente Sul / Vargens & Guaratiba", pos: "0.04 0.025 0.10" },
+          { text: "🏘️ Vertente Norte / Campo Grande & Bangu", pos: "-0.04 0.025 -0.10" }
+        ]
+      },
+      comparativo: {
+        desc: "<strong>Transecto Oeste–Leste do Rio de Janeiro:</strong> Contraste entre o Maciço da Pedra Branca (1.024 m, à esquerda), a planície sedimentar da Baixada de Jacarepaguá (centro) e o Maciço da Tijuca (1.021 m, à direita).",
+        hs: [
+          { text: "⛰️ Maciço da Pedra Branca (1.024 m)", pos: "-0.11 0.090 0.00" },
+          { text: "🏞️ Baixada de Jacarepaguá (Planície)", pos: "0.00 0.012 0.02" },
+          { text: "⛰️ Maciço da Tijuca (1.021 m)", pos: "0.11 0.088 -0.01" }
+        ]
+      }
+    };
+
+    function hypsometricColor(t) {
+      // Azul (planície/nível do mar) -> Verde (sopé/floresta) -> Amarelo (média encosta) -> Vermelho/Branco (cumeada)
+      const stops = [
+        [0.00, [0.02, 0.52, 0.78]],
+        [0.18, [0.09, 0.64, 0.29]],
+        [0.48, [0.92, 0.70, 0.03]],
+        [0.78, [0.86, 0.15, 0.15]],
+        [1.00, [0.98, 0.98, 0.98]]
+      ];
+      for (let i = 0; i < stops.length - 1; i++) {
+        const [t0, c0] = stops[i];
+        const [t1, c1] = stops[i + 1];
+        if (t >= t0 && t <= t1) {
+          const f = (t - t0) / (t1 - t0);
+          return [
+            c0[0] + f * (c1[0] - c0[0]),
+            c0[1] + f * (c1[1] - c0[1]),
+            c0[2] + f * (c1[2] - c0[2])
+          ];
+        }
+      }
+      return [0.5, 0.5, 0.5];
+    }
+
+    function computeElevation(nx, nz, preset) {
+      if (preset === 'tijuca') {
+        // Bloco alongado SW-NE característico do Maciço da Tijuca + esporão da Pedra da Gávea + vale do Alto da Boa Vista
+        const picoTijuca = Math.exp(-(((nx - 0.10) ** 2) / 0.12 + ((nz + 0.10) ** 2) / 0.09)) * 1.02;
+        const sumareCorcovado = Math.exp(-(((nx - 0.34) ** 2) / 0.07 + ((nz + 0.04) ** 2) / 0.06)) * 0.74;
+        const gaveaBonita = Math.exp(-(((nx + 0.26) ** 2) / 0.06 + ((nz - 0.36) ** 2) / 0.05)) * 0.84;
+        const valeAlto = Math.exp(-(((nx + 0.05 + 0.15 * nz) ** 2) / 0.025)) * 0.32;
+        return Math.max(0.01, picoTijuca + sumareCorcovado + gaveaBonita - valeAlto);
+      }
+      if (preset === 'pedrabranca') {
+        // Maciço da Pedra Branca: domo amplo e maciço com cume central (1.024 m) e espigões radiais
+        const r2 = (nx * 1.05) ** 2 + (nz * 1.15) ** 2;
+        const domoPrincipal = Math.exp(-r2 / 0.24) * 1.024;
+        const cristaOeste = Math.exp(-(((nx + 0.35) ** 2) / 0.08 + ((nz - 0.12) ** 2) / 0.09)) * 0.65;
+        const cristaLeste = Math.exp(-(((nx - 0.36) ** 2) / 0.08 + ((nz + 0.14) ** 2) / 0.08)) * 0.62;
+        const drenagem = Math.exp(-(((nz - 0.22 * Math.sin(nx * 5.0)) ** 2) / 0.018)) * 0.18;
+        return Math.max(0.01, domoPrincipal + cristaOeste + cristaLeste - drenagem);
+      }
+      // Comparativo Oeste -> Leste: Pedra Branca (esq) | Baixada de Jacarepaguá (centro) | Tijuca (dir)
+      const pedraBranca = Math.exp(-(((nx + 0.56) ** 2) / 0.075 + ((nz * 1.1) ** 2) / 0.22)) * 1.024;
+      const tijuca = Math.exp(-(((nx - 0.56) ** 2) / 0.065 + ((nz * 1.15) ** 2) / 0.18)) * 1.021;
+      const gericinoNorte = Math.exp(-(((nx + 0.15) ** 2) / 0.14 + ((nz + 0.78) ** 2) / 0.04)) * 0.58;
+      return Math.max(0.01, pedraBranca + tijuca + gericinoNorte);
+    }
+
+    function buildTerrainGLB(preset = 'tijuca', verticalExag = 1.5) {
+      const grid = 56;
+      const size = 0.38;
+      const vertCount = grid * grid;
+      const positions = new Float32Array(vertCount * 3);
+      const normals = new Float32Array(vertCount * 3);
+      const colors = new Float32Array(vertCount * 3);
+
+      const heights = new Float32Array(vertCount);
+      let minH = Infinity, maxH = -Infinity;
+
+      for (let z = 0; z < grid; z++) {
+        for (let x = 0; x < grid; x++) {
+          const nx = (x / (grid - 1)) * 2 - 1;
+          const nz = (z / (grid - 1)) * 2 - 1;
+          const h = computeElevation(nx, nz, preset) * 0.058 * verticalExag;
+          const idx = z * grid + x;
+          heights[idx] = h;
+          if (h < minH) minH = h;
+          if (h > maxH) maxH = h;
+        }
+      }
+
+      const span = Math.max(0.0001, maxH - minH);
+      for (let z = 0; z < grid; z++) {
+        for (let x = 0; x < grid; x++) {
+          const idx = z * grid + x;
+          const px = ((x / (grid - 1)) - 0.5) * size;
+          const pz = ((z / (grid - 1)) - 0.5) * size;
+          const py = heights[idx];
+
+          positions[idx * 3] = px;
+          positions[idx * 3 + 1] = py;
+          positions[idx * 3 + 2] = pz;
+
+          const hL = heights[z * grid + Math.max(0, x - 1)];
+          const hR = heights[z * grid + Math.min(grid - 1, x + 1)];
+          const hD = heights[Math.max(0, z - 1) * grid + x];
+          const hU = heights[Math.min(grid - 1, z + 1) * grid + x];
+          const dx = (2 * size) / (grid - 1);
+          let nx = hL - hR, ny = dx, nz = hD - hU;
+          const len = Math.hypot(nx, ny, nz) || 1;
+          normals[idx * 3] = nx / len;
+          normals[idx * 3 + 1] = ny / len;
+          normals[idx * 3 + 2] = nz / len;
+
+          const normH = (py - minH) / span;
+          const [r, g, b] = hypsometricColor(normH);
+          colors[idx * 3] = r;
+          colors[idx * 3 + 1] = g;
+          colors[idx * 3 + 2] = b;
+        }
+      }
+
+      const quadCount = (grid - 1) * (grid - 1);
+      const indices = new Uint16Array(quadCount * 6);
+      let ptr = 0;
+      for (let z = 0; z < grid - 1; z++) {
+        for (let x = 0; x < grid - 1; x++) {
+          const i0 = z * grid + x;
+          const i1 = i0 + 1;
+          const i2 = i0 + grid;
+          const i3 = i2 + 1;
+          indices[ptr++] = i0; indices[ptr++] = i2; indices[ptr++] = i1;
+          indices[ptr++] = i1; indices[ptr++] = i2; indices[ptr++] = i3;
+        }
+      }
+
+      const posBytes = positions.byteLength;
+      const normBytes = normals.byteLength;
+      const colBytes = colors.byteLength;
+      const idxBytes = indices.byteLength;
+      const totalBin = posBytes + normBytes + colBytes + idxBytes;
+      const binPadded = (totalBin + 3) & ~3;
+
+      const gltf = {
+        asset: { version: "2.0", generator: "LAIGEO-UERJ Maciços RJ WebAR" },
+        scene: 0,
+        scenes: [{ nodes: [0] }],
+        nodes: [{ mesh: 0 }],
+        meshes: [{
+          primitives: [{
+            attributes: { POSITION: 0, NORMAL: 1, COLOR_0: 2 },
+            indices: 3,
+            material: 0
+          }]
+        }],
+        materials: [{
+          pbrMetallicRoughness: { roughnessFactor: 0.78, metallicFactor: 0.05 },
+          doubleSided: true
+        }],
+        buffers: [{ byteLength: binPadded }],
+        bufferViews: [
+          { buffer: 0, byteOffset: 0, byteLength: posBytes, target: 34962 },
+          { buffer: 0, byteOffset: posBytes, byteLength: normBytes, target: 34962 },
+          { buffer: 0, byteOffset: posBytes + normBytes, byteLength: colBytes, target: 34962 },
+          { buffer: 0, byteOffset: posBytes + normBytes + colBytes, byteLength: idxBytes, target: 34963 }
+        ],
+        accessors: [
+          { bufferView: 0, componentType: 5126, count: vertCount, type: "VEC3", min: [-size/2, minH, -size/2], max: [size/2, maxH, size/2] },
+          { bufferView: 1, componentType: 5126, count: vertCount, type: "VEC3" },
+          { bufferView: 2, componentType: 5126, count: vertCount, type: "VEC3" },
+          { bufferView: 3, componentType: 5123, count: indices.length, type: "SCALAR" }
+        ]
+      };
+
+      const jsonStr = JSON.stringify(gltf);
+      const jsonBytes = new TextEncoder().encode(jsonStr);
+      const jsonPadded = (jsonBytes.length + 3) & ~3;
+      const totalLength = 12 + 8 + jsonPadded + 8 + binPadded;
+
+      const glb = new ArrayBuffer(totalLength);
+      const view = new DataView(glb);
+      const u8 = new Uint8Array(glb);
+
+      view.setUint32(0, 0x46546C67, true);
+      view.setUint32(4, 2, true);
+      view.setUint32(8, totalLength, true);
+
+      view.setUint32(12, jsonPadded, true);
+      view.setUint32(16, 0x4E4F534A, true);
+      u8.set(jsonBytes, 20);
+      for (let i = jsonBytes.length; i < jsonPadded; i++) u8[20 + i] = 0x20;
+
+      const binHeaderOffset = 20 + jsonPadded;
+      view.setUint32(binHeaderOffset, binPadded, true);
+      view.setUint32(binHeaderOffset + 4, 0x004E4942, true);
+
+      const binStart = binHeaderOffset + 8;
+      u8.set(new Uint8Array(positions.buffer), binStart);
+      u8.set(new Uint8Array(normals.buffer), binStart + posBytes);
+      u8.set(new Uint8Array(colors.buffer), binStart + posBytes + normBytes);
+      u8.set(new Uint8Array(indices.buffer), binStart + posBytes + normBytes + colBytes);
+
+      return URL.createObjectURL(new Blob([glb], { type: 'model/gltf-binary' }));
+    }
+
+    const viewer = document.getElementById('terrainViewer');
+    const presetSel = document.getElementById('terrainPreset');
+    const exagInput = document.getElementById('exaggeration');
+    const exagVal = document.getElementById('exagVal');
+    const customGlb = document.getElementById('customGlb');
+    const geoContext = document.getElementById('geoContext');
+    let currentUrl = null;
+
+    function updateHotspots(preset, exag) {
+      const data = SCENARIOS[preset];
+      geoContext.innerHTML = data.desc;
+      data.hs.forEach((item, index) => {
+        const el = document.getElementById('hs' + (index + 1));
+        if (!el) return;
+        el.textContent = item.text;
+        const [x, y, z] = item.pos.split(' ').map(Number);
+        const scaledY = (y * (exag / 1.5)).toFixed(3);
+        el.setAttribute('data-position', `${x} ${scaledY} ${z}`);
+      });
+    }
+
+    function updateTerrain() {
+      if (currentUrl) URL.revokeObjectURL(currentUrl);
+      const preset = presetSel.value;
+      const exag = parseFloat(exagInput.value);
+      exagVal.textContent = exag.toFixed(1) + 'x';
+      currentUrl = buildTerrainGLB(preset, exag);
+      viewer.src = currentUrl;
+      updateHotspots(preset, exag);
+    }
+
+    presetSel.addEventListener('change', updateTerrain);
+    exagInput.addEventListener('input', updateTerrain);
+
+    customGlb.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      if (currentUrl) URL.revokeObjectURL(currentUrl);
+      currentUrl = URL.createObjectURL(file);
+      viewer.src = currentUrl;
+      geoContext.innerHTML = "<strong>Modelo Personalizado Carregado:</strong> " + file.name;
+    });
+
+    updateTerrain();
+  </script>
+</body>
+</html>

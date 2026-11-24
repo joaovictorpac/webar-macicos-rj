@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Meu Modelo Cartográfico em WebAR — LAIGEO / UERJ</title>
+  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
+  <style>
+    body { margin: 0; background: #111827; color: #fff; font-family: sans-serif; }
+    model-viewer { width: 100vw; height: 100vh; }
+    .btn-ar {
+      position: absolute; bottom: 20px; right: 20px;
+      background: #10b981; color: #052e16; font-weight: bold;
+      border: none; border-radius: 24px; padding: 12px 20px; font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+  <!-- PASSO 1: Coloque seu arquivo exportado do Blender/MeshLab/QGIS na mesma pasta com o nome 'meu_terreno.glb' -->
+  <!-- PASSO 2: Abra esta pasta com um servidor local (ex.: VS Code Live Server ou 'python -m http.server') ou suba no GitHub Pages -->
+  <model-viewer
+    src="meu_terreno.glb"
+    alt="Modelo 3D do Terreno"
+    ar
+    ar-modes="webxr scene-viewer quick-look"
+    camera-controls
+    shadow-intensity="1">
+    <button slot="ar-button" class="btn-ar">📱 Abrir em Realidade Aumentada</button>
+  </model-viewer>
+</body>
+</html>
